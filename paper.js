@@ -1,15 +1,13 @@
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
-ctx.imageSmoothingEnabled = false; // Wyłączenie interpolacji
+ctx.imageSmoothingEnabled = false;
 let drawing = false;
 let lastX = null;
 let lastY = null;
 
-// Stosy do przechowywania stanu płótna
 const undoStack = [];
 const redoStack = [];
 
-// Pobierz ustawienia
 const brushSizeInput = document.getElementById('brush-size');
 const brushColorInput = document.getElementById('brush-color');
 const brushShapeInput = document.getElementById('brush-shape');
@@ -19,13 +17,11 @@ const exportButton = document.getElementById('export-image');
 const loadButton = document.getElementById('load-image');
 const imageDataTextarea = document.getElementById('image-data');
 
-// Zapisz stan płótna
 function saveState() {
     undoStack.push(canvas.toDataURL());
-    redoStack.length = 0; // Wyczyść stos redo po nowym rysowaniu
+    redoStack.length = 0;
 }
 
-// Przywróć stan płótna
 function restoreState(stack) {
     if (stack.length > 0) {
         const imgData = stack.pop();
@@ -38,12 +34,11 @@ function restoreState(stack) {
     }
 }
 
-// Obsługa rysowania
 canvas.addEventListener('mousedown', (e) => {
-    saveState(); // Zapisz stan przed rozpoczęciem rysowania
+    saveState();
     drawing = true;
     lastX = null;
-    lastY = null; // Resetuj ostatnie współrzędne
+    lastY = null;
 });
 canvas.addEventListener('mouseup', () => drawing = false);
 canvas.addEventListener('mousemove', (e) => {
@@ -60,7 +55,6 @@ canvas.addEventListener('mousemove', (e) => {
 
     ctx.fillStyle = brushColor;
 
-    // Rysuj tylko, jeśli odstęp jest wystarczający
     if (lastX === null || lastY === null || Math.hypot(x - lastX, y - lastY) >= brushSpacing) {
         if (brushShape === 'square') {
             ctx.fillRect(x - brushSize / 2, y - brushSize / 2, brushSize, brushSize);
@@ -72,13 +66,12 @@ canvas.addEventListener('mousemove', (e) => {
             drawSpray(x, y, brushSize, brushColor);
         }
         lastX = x;
-        lastY = y; // Zaktualizuj ostatnie współrzędne
+        lastY = y;
     }
 });
 
-// Funkcja rysowania sprayu
 function drawSpray(x, y, brushSize, brushColor) {
-    const sprayDensity = 50; // Liczba punktów w sprayu
+    const sprayDensity = 50;
     ctx.fillStyle = brushColor;
 
     for (let i = 0; i < sprayDensity; i++) {
@@ -90,7 +83,6 @@ function drawSpray(x, y, brushSize, brushColor) {
     }
 }
 
-// Funkcja wypełniania płótna
 function fillCanvas(x, y, targetColor, fillColor) {
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const data = imageData.data;
@@ -142,47 +134,42 @@ function fillCanvas(x, y, targetColor, fillColor) {
     ctx.putImageData(imageData, 0, 0);
 }
 
-// Obsługa przycisku "Clear"
 clearCanvasButton.addEventListener('click', () => {
     const confirmClear = confirm('Are you sure you want to clear the canvas?');
     if (confirmClear) {
-        saveState(); // Zapisz stan przed wyczyszczeniem
+        saveState();
         ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
 });
 
-// Obsługa Undo
 document.addEventListener('keydown', (e) => {
-    if (e.ctrlKey && e.key === 'z') { // Skrót Ctrl+Z
+    if (e.ctrlKey && e.key === 'z') {
         restoreState(undoStack);
         redoStack.push(canvas.toDataURL());
     }
 });
 
-// Obsługa Redo
 document.addEventListener('keydown', (e) => {
-    if (e.ctrlKey && e.key === 'y') { // Skrót Ctrl+Y
+    if (e.ctrlKey && e.key === 'y') {
         restoreState(redoStack);
         undoStack.push(canvas.toDataURL());
     }
 });
 
-// Eksportuj obraz do Base64
 exportButton.addEventListener('click', () => {
-    const imageData = canvas.toDataURL('image/png'); // Generuj dane obrazu w Base64
-    imageDataTextarea.value = imageData; // Wyświetl string Base64 w polu tekstowym
+    const imageData = canvas.toDataURL('image/png');
+    imageDataTextarea.value = imageData;
     alert('Image exported as Base64!');
 });
 
-// Załaduj obraz z Base64
 loadButton.addEventListener('click', () => {
-    const imageData = imageDataTextarea.value; // Pobierz dane Base64 z pola tekstowego
+    const imageData = imageDataTextarea.value;
     if (imageData) {
         const img = new Image();
-        img.src = imageData; // Ustaw źródło obrazu na dane Base64
+        img.src = imageData;
         img.onload = () => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height); // Wyczyść płótno
-            ctx.drawImage(img, 0, 0); // Narysuj obraz na płótnie
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0);
         };
     } else {
         alert('No image data to load!');

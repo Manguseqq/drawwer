@@ -14,8 +14,4 @@ I'm planning to add more cool stuff in the future, like:
 ## Why I Made This 
 Nothing but to waste my time and play with js 💔
 I know you don't gaf either 🥀
-
-## Try It Out! 
-Clone the repo and give it a try beacuse i dont know how to use guthib pages: 🥀
-```bash
-git clone https://github.com/Manguseqq/drawwer.git
+90% chatgpt ahh project 💔💔
